@@ -19,13 +19,6 @@ export default class Game extends cc.Component {
     @property(cc.Sprite)
     drawSp: cc.Sprite = null;
 
-    @property({
-        type: cc.Integer,
-        min: 1,
-        tooltip: '历史记录最大数量'
-    })
-    maxHistory: number = 50;
-
     @property(cc.Camera)
     captureCamera: cc.Camera = null;
 
@@ -50,7 +43,7 @@ export default class Game extends cc.Component {
         //创建一个画板(需传入画板尺寸，将自动初始化)
         this.db = new DrawingBoard(this.node.width, this.node.height);
         //设置画板的绘图颜色（每次绘制前都可以重新设置）
-        this.lastLineWidth = 1;
+        this.lastLineWidth = 5;
         this.db.setLineWidth(this.lastLineWidth);
         this.db.setColor(this.lastColor.r, this.lastColor.g, this.lastColor.b, this.lastColor.a);
         //线条端点以圆角结尾
@@ -87,12 +80,12 @@ export default class Game extends cc.Component {
     }
 
     onTouchEnd(e: cc.Event.EventTouch) {
-        let data = this.db.copyData();
-        let copy: Uint8Array = Uint8Array.from(data);
+        this.addHistory();
+    }
+
+    addHistory() {
+        let copy = this.db.copyPixel();
         this.history.push({ data: copy });
-        if (this.history.length > 20) {
-            this.history = this.history.slice(this.history.length - 20);
-        }
         cc.log('历史步骤: ', this.history.length);
     }
 
@@ -104,13 +97,13 @@ export default class Game extends cc.Component {
     }
 
     onBtnDraw() {
-        this.lastLineWidth = 10;
         this.db.setLineWidth(this.lastLineWidth);
         this.db.setColor(this.lastColor.r, this.lastColor.g, this.lastColor.b, this.lastColor.a);
         this.gameState = GameState.drawing;
     }
 
     onBtnErase() {
+        this.db.setLineWidth(this.lastLineWidth * 3);
         this.db.setColor(0, 0, 0, 0);
         this.gameState = GameState.erasing;
     }
@@ -123,12 +116,14 @@ export default class Game extends cc.Component {
 
     onBtnRevoke() {
         this.history.pop();
-        cc.log('历史记录剩余: ', this.history.length);
         if (this.history.length) {
             let data: Uint8Array = this.history[this.history.length - 1].data;
             this.db.setPixelColor(data);
-            this.texture.initWithData(data, cc.Texture2D.PixelFormat.RGBA8888, this.db.width, this.db.height);
+            this.texture.initWithData(this.db.getData(), cc.Texture2D.PixelFormat.RGBA8888, this.db.width, this.db.height);
+        } else {
+            this.onBtnClear();
         }
+        cc.log('历史记录剩余: ', this.history.length);
     }
 
     onBtnSave() {
@@ -165,9 +160,9 @@ export default class Game extends cc.Component {
             saveLink.href = dataUrl;
             saveLink.download = String(Date.now()) + '.jpg';
             let event = document.createEvent('MouseEvents');
-            event.initMouseEvent('click',true,false,window,0,0,0,0,0,false,false,false,false,0,null);
+            event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             saveLink.dispatchEvent(event);
-            this.scheduleOnce(t=>{
+            this.scheduleOnce(t => {
                 this.captureCamera.enabled = false;
             }, 0.1);
         } else {

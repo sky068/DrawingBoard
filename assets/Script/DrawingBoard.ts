@@ -97,6 +97,8 @@ export default class DrawingBoard {
         this.pixelColor.fill(0);
     }
     public setPixelColor(data: Uint8Array) {
+        this.resetMaskPoint();
+        this.resetPointColor();
         this.pixelColor = data;
     }
     //#endregion
@@ -225,6 +227,14 @@ export default class DrawingBoard {
             data[i] = this.pixelColor[i];
         }
         return data;
+    }
+    /**
+     * add by sky 20210113
+     */
+    public copyPixel(): Uint8Array {
+        let copy: Uint8Array = new Uint8Array(4);
+        copy = Uint8Array.from(this.pixelColor);
+        return copy;
     }
     /**
      * 获取画板中记录每个像素的颜色分量的数据
