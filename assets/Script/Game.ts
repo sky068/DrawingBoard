@@ -53,7 +53,7 @@ export default class Game extends cc.Component {
 
     initTexture() {
         this.texture = new cc.RenderTexture();
-        this.texture.initWithSize(this.node.width, this.node.height, cc.RenderTexture.DepthStencilFormat.RB_FMT_S8);
+        this.texture.initWithSize(this.drawNode.width, this.drawNode.height, cc.RenderTexture.DepthStencilFormat.RB_FMT_S8);
         let spf: cc.SpriteFrame = new cc.SpriteFrame(this.texture);
         this.drawNode.getComponent(cc.Sprite).spriteFrame = spf;
     }
@@ -141,8 +141,8 @@ export default class Game extends cc.Component {
 
     onBtnSave() {
         if (cc.sys.isBrowser) {
-            let width = this.node.width;
-            let height = this.node.height;
+            let width = this.drawNode.width;
+            let height = this.drawNode.height;
 
             this.captureCamera.enabled = true;
             let texture = new cc.RenderTexture();
