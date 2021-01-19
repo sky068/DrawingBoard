@@ -3,3 +3,5 @@
 
 > 参考https://forum.cocos.org/t/topic/89902.
 
+[在线体验 https://skyxu123.gitee.io/gamelover/games/drawingboard/]('https://skyxu123.gitee.io/gamelover/games/drawingboard/')
+
